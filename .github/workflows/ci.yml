@@ -1,0 +1,44 @@
+name: Cross Compile to FreeBSD AArch64
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        repository: github.com/sigoden/dufs
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rust-src  # Source required for cross-compilation
+
+    - name: Install FreeBSD target
+      run: rustup target add aarch64-unknown-freebsd
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang llvm libssl-dev
+
+    - name: Cross compile to FreeBSD AArch64
+      run: cargo build --release --target aarch64-unknown-freebsd
+
+    - name: Upload compiled artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: freebsd-aarch64-build
+        path: target/aarch64-unknown-freebsd/release/dufs
