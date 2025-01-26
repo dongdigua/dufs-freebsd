@@ -23,11 +23,8 @@ jobs:
       with:
         profile: minimal
         toolchain: stable
-        override: true
+        target: aarch64-unknown-freebsd
         components: rust-src  # Source required for cross-compilation
-
-    - name: Install FreeBSD target
-      run: rustup target add aarch64-unknown-freebsd
 
     - name: Install dependencies
       run: |
