@@ -26,12 +26,19 @@ jobs:
       with:
         target: aarch64-unknown-freebsd@14
     - run: |
-        sed '/^panic/d' Cargo.toml > Cargo.toml.p
-        mv Cargo.toml.p Cargo.toml
-        CFLAGS=-Wno-implicit-function-declaration cargo build --release --verbose -Z build-std  
+        # error[E0463]: can't find crate for `panic_abort`
+        sed '/^panic/d' Cargo.toml > Cargo.toml.p && mv Cargo.toml.p Cargo.toml
+        # https://github.com/tukaani-project/xz/blob/c0f4269966ec07a9c9f9dba11691657be892b767/src/common/mythread.h#L312
+        CFLAGS=-Wno-implicit-function-declaration cargo build --release --verbose -Z build-std
 
     - name: Upload compiled artifact
       uses: actions/upload-artifact@v3
       with:
         name: freebsd-aarch64-build
         path: target/aarch64-unknown-freebsd/release/dufs
+ 
+    - name: Publish Archive
+      uses: softprops/action-gh-release@v2
+      with:
+        draft: true
+        files: target/aarch64-unknown-freebsd/release/dufs
