@@ -18,21 +18,14 @@ jobs:
       with:
         repository: sigoden/dufs
 
-    - name: Set up Rust
-      uses: actions-rs/toolchain@v1
+    - name: Install Rust
+      run: rustup update nightly && rustup default nightly
+       
+    - name: Install cross-compilation tools
+      uses: taiki-e/setup-cross-toolchain-action@v1
       with:
-        profile: minimal
-        toolchain: stable
-        target: aarch64-unknown-freebsd
-        components: rust-src  # Source required for cross-compilation
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang llvm libssl-dev
-
-    - name: Cross compile to FreeBSD AArch64
-      run: cargo build --release --target aarch64-unknown-freebsd
+        target: aarch64-unknown-freebsd@14
+    - run: cargo build --release --verbose -Z build-std
 
     - name: Upload compiled artifact
       uses: actions/upload-artifact@v3
