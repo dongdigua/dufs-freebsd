@@ -20,6 +20,9 @@ jobs:
           - x86_64-unknown-freebsd
 
     steps:
+    - name: Get current date
+      run: echo "TAG=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+    
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
@@ -32,8 +35,9 @@ jobs:
       uses: taiki-e/setup-cross-toolchain-action@v1
       with:
         target: ${{ matrix.target }}
-  
-    - run: |
+
+    - name: Compile!
+      run: |
         # error[E0463]: can't find crate for `panic_abort`
         sed '/^panic/d' Cargo.toml > Cargo.toml.p && mv Cargo.toml.p Cargo.toml
         # https://github.com/tukaani-project/xz/blob/c0f4269966ec07a9c9f9dba11691657be892b767/src/common/mythread.h#L312
@@ -41,15 +45,16 @@ jobs:
         cp target/${{ matrix.target }}/release/dufs dufs-${{ matrix.target }}
 
     - name: Upload compiled artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: freebsd-aarch64-build
-        path: target/${{ matrix.target }}/release/dufs
+        name: dufs-freebsd-build
+        path: dufs-${{ matrix.target }}
  
     - name: Publish Archive
       uses: softprops/action-gh-release@v2
       with:
-        draft: true
+        draft: false
+        tag_name: ${{ env.TAG }}
         files: |
           dufs-aarch64-unknown-freebsd
           dufs-x86_64-unknown-freebsd
