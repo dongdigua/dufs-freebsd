@@ -25,7 +25,7 @@ jobs:
       uses: taiki-e/setup-cross-toolchain-action@v1
       with:
         target: aarch64-unknown-freebsd@14
-    - run: cargo build --release --verbose -Z build-std
+    - run: CFLAGS=-Wno-implicit-function-declaration cargo build --release --verbose -Z build-std
 
     - name: Upload compiled artifact
       uses: actions/upload-artifact@v3
