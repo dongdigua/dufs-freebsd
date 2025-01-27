@@ -47,7 +47,7 @@ jobs:
     - name: Upload compiled artifact
       uses: actions/upload-artifact@v4
       with:
-        name: dufs-freebsd-build
+        name: dufs-${{ matrix.target }}
         path: dufs-${{ matrix.target }}
  
     - name: Publish Archive
